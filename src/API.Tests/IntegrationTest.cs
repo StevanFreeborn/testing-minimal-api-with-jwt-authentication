@@ -48,7 +48,7 @@ public class TestServerFactory : WebApplicationFactory<Program>
 {
   protected override void ConfigureWebHost(IWebHostBuilder builder)
   {
-    _ = builder.UseConfiguration(TestJwtTokenBuilder.ToConfig());
+    _ = builder.UseConfiguration(TestJwtTokenBuilder.CreateTestConfiguration());
   }
 }
 
@@ -59,7 +59,7 @@ public class TestJwtTokenBuilder
   public static readonly string TestJwtIssuer = "TestIssuer";
   public static readonly int TestJwtExpiryInMinutes = 5;
 
-  public static IConfiguration ToConfig()
+  public static IConfiguration CreateTestConfiguration()
   {
     JwtOptions jwtOptions = new()
     {
