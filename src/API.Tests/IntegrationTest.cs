@@ -59,6 +59,11 @@ public class TestJwtTokenBuilder
   public static readonly string TestJwtIssuer = "TestIssuer";
   public static readonly int TestJwtExpiryInMinutes = 5;
 
+  private static readonly SigningCredentials TestSigningCredentials = new(
+    new SymmetricSecurityKey(Encoding.UTF8.GetBytes(TestJwtSecret)),
+    SecurityAlgorithms.HmacSha256Signature
+  );
+
   public static IConfiguration CreateTestConfiguration()
   {
     JwtOptions jwtOptions = new()
@@ -102,22 +107,16 @@ public class TestJwtTokenBuilder
   public string Build()
   {
     JwtSecurityTokenHandler tokenHandler = new();
-    byte[] key = Encoding.UTF8.GetBytes(TestJwtSecret);
-    DateTime issuedAt = IssuedAt;
-    DateTime expires = issuedAt.AddMinutes(TestJwtExpiryInMinutes);
 
     SecurityTokenDescriptor tokenDescriptor = new()
     {
       Subject = new ClaimsIdentity(_claims),
-      Expires = expires,
-      IssuedAt = issuedAt,
-      NotBefore = issuedAt,
+      IssuedAt = IssuedAt,
+      Expires = IssuedAt.AddMinutes(TestJwtExpiryInMinutes),
+      NotBefore = IssuedAt,
       Issuer = TestJwtIssuer,
       Audience = TestJwtAudience,
-      SigningCredentials = new SigningCredentials(
-        new SymmetricSecurityKey(key),
-        SecurityAlgorithms.HmacSha256Signature
-      )
+      SigningCredentials = TestSigningCredentials
     };
 
     SecurityToken securityToken = tokenHandler.CreateToken(tokenDescriptor);
